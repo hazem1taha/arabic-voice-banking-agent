@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Frontend
+node_modules/
+frontend/dist/
+frontend/.svelte-kit/
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Audio
+static/audio/response_*.mp3
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

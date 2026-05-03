@@ -1,0 +1,56 @@
+%%{ init: { 'theme': 'dark' } }%%
+sequenceDiagram
+    participant U as 👤 User
+    participant FE as Frontend (React)
+    participant BE as Backend (FastAPI)
+    participant STT as Whisper API
+    participant LLM as GPT-4o
+    participant BANK as Banking Service
+    participant TTS as OpenAI TTS
+    participant REDIS as Redis
+
+    U->>+FE: Press & hold mic button
+    FE->>FE: navigator.mediaDevices.getUserMedia
+    FE->>FE: MediaRecorder.start()
+
+    U->>-FE: Release mic button
+    FE->>FE: MediaRecorder.stop()
+    FE->>FE: audioChunks → Blob
+
+    FE->>+BE: POST /api/v1/conversation/turn<br/>multipart: audio.webm + session_id
+
+    BE->>+STT: audio_bytes
+    STT->>-BE: transcript: "ما رصيدي؟"<br/>language: "ar"
+    Note over BE: timer.stt recorded
+
+    BE->>+REDIS: GET session:{session_id}
+    REDIS->>-BE: turns: [...last 10]
+    Note over BE: session_store.get_recent_turns_dict()
+
+    BE->>+LLM: user_transcript + history + system_prompt
+    LLM->>-BE: tool_calls: [get_account_balance]
+    Note over BE: timer.llm recorded
+
+    loop For each tool call
+        BE->>+BANK: execute_tool("get_account_balance", {})
+        BANK->>-BE: {accounts: [...], customer_name: "Hazem Taha"}
+    end
+
+    BE->>+LLM: tool_results → second LLM call
+    LLM->>-BE: "رصيدك: حساب التوفير 38,200 BHD،<br/>الحساب الجاري 12,450 BHD"
+    Note over BE: second LLM call included in timer.llm
+
+    BE->>+TTS: response_text
+    TTS->>-BE: audio_bytes (MP3)
+    Note over BE: timer.tts recorded
+
+    BE->>REDIS: APPEND turns (user + assistant)
+    Note over BE: session ttl refreshed
+
+    BE->>-FE: {<br/>  transcript: "ما رصيدي؟",<br/>  assistant_text: "...",<br/>  audio_url: "/api/v1/audio/{turn_id}",<br/>  latency_ms: {stt, llm, tools, tts, total}<br/>}
+
+    FE->>+FE: Play audio response
+    FE->>FE: Update transcript + latency panel
+    FE->>-U: Show response bubble
+
+    Note over U,FE: Total time: 1.5–2.5s on typical laptop + good connection

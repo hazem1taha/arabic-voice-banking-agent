@@ -1,0 +1,57 @@
+%%{ init: { 'theme': 'dark', ' flowchart': { 'curve': 'linear' } } }%%
+flowchart TB
+    subgraph Browser["Browser (WebRTC + Web Audio)"]
+        A1["🎤 Microphone"]
+        A2["MediaRecorder\n(WebM/Opus)"]
+        A3["Audio Element\n(playback)"]
+    end
+
+    subgraph Frontend["Frontend (React 18 + Vite)"]
+        F1["VoiceButton\n(hold-to-talk)"]
+        F2["Transcript\n(RTL bubbles)"]
+        F3["LatencyPanel\n(per-stage ms)"]
+        F4["ToolCallView\n(collapsible)"]
+    end
+
+    A1 --> A2 --> F1
+    F2 --> A3
+    F1 -->|POST /api/v1/conversation/turn| Backend
+
+    subgraph Backend["Backend (FastAPI + Python 3.11)"]
+        B1["POST /conversation/turn\n(multipart: audio + session_id)"]
+        B2["STT Service\n(Whisper API)"]
+        B3["Session Store\n(Redis, 1hr TTL)"]
+        B4["LLM Service\n(GPT-4o + function calling)"]
+        B5["Banking Service\n(mock data)"]
+        B6["TTS Service\n(tts-1, nova voice)"]
+    end
+
+    B1 --> B2
+    B2 --> B3
+    B3 --> B4
+    B4 -->|execute tools| B5
+    B5 -->|tool results| B4
+    B4 --> B6
+
+    Backend -->|response JSON| Frontend
+    Backend -->|GET /api/v1/audio/{turn_id}| Frontend
+
+    subgraph External["External Services"]
+        E1["OpenAI API\n(Whisper + GPT-4o + TTS)"]
+        E2["Redis\n(TTL-backed session)"]
+    end
+
+    B2 -.->|whisper-1| E1
+    B4 -.->|gpt-4o + tools| E1
+    B6 -.->|tts-1 + nova| E1
+    B3 -.->|session data| E2
+
+    classDef browser fill:#1a1a2e,stroke:#444
+    classDef frontend fill:#16213e,stroke:#333
+    classDef backend fill:#0f3460,stroke:#444
+    classDef external fill:#1a1a2e,stroke:#666,stroke-dasharray: 5 5
+
+    class A1,A2,A3,Browser browser
+    class F1,F2,F3,F4,Frontend frontend
+    class B1,B2,B3,B4,B5,B6,Backend backend
+    class E1,E2,External external

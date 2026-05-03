@@ -1,0 +1,80 @@
+{
+  "customers": {
+    "cust-001": {
+      "customer_id": "cust-001",
+      "name": "Hazem Taha",
+      "name_ar": "حازم طه",
+      "accounts": [
+        {
+          "account_id": "acc-001",
+          "type": "checking",
+          "balance": 12450.75,
+          "currency": "BHD"
+        },
+        {
+          "account_id": "acc-002",
+          "type": "savings",
+          "balance": 38200.00,
+          "currency": "BHD"
+        }
+      ],
+      "cards": [
+        {
+          "card_id": "card-001",
+          "type": "debit",
+          "last_four": "4521",
+          "status": "active",
+          "linked_account": "acc-001"
+        }
+      ],
+      "transactions": [
+        {
+          "id": "tx-001",
+          "account_id": "acc-001",
+          "amount": -45.00,
+          "merchant": "Carrefour",
+          "date": "2026-04-28",
+          "currency": "BHD",
+          "category": "groceries"
+        },
+        {
+          "id": "tx-002",
+          "account_id": "acc-001",
+          "amount": -12.50,
+          "merchant": "Costa Coffee",
+          "date": "2026-04-27",
+          "currency": "BHD",
+          "category": "food"
+        },
+        {
+          "id": "tx-003",
+          "account_id": "acc-001",
+          "amount": 2500.00,
+          "merchant": "Salary - Calo Inc",
+          "date": "2026-04-25",
+          "currency": "BHD",
+          "category": "income"
+        },
+        {
+          "id": "tx-004",
+          "account_id": "acc-001",
+          "amount": -180.00,
+          "merchant": "Gulf Air",
+          "date": "2026-04-20",
+          "currency": "BHD",
+          "category": "travel"
+        },
+        {
+          "id": "tx-005",
+          "account_id": "acc-001",
+          "amount": -6.50,
+          "merchant": "Talabat",
+          "date": "2026-04-19",
+          "currency": "BHD",
+          "category": "food"
+        }
+      ],
+      "disputes": []
+    }
+  }
+}
