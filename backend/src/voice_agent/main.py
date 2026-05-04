@@ -91,9 +91,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Mount static (frontend + audio)
+# Mount static (frontend + audio) — only when the directory exists (production build)
 root_static = Path(__file__).parent.parent.parent / "frontend"
-app.mount("/static", StaticFiles(directory=str(root_static)), name="static")
+if root_static.exists():
+    app.mount("/static", StaticFiles(directory=str(root_static)), name="static")
 
 # API routes
 app.include_router(routes.router)

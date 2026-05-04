@@ -42,14 +42,17 @@ class STTService:
                 response = await self._client.audio.transcriptions.create(
                     model=self._model,
                     file=file_obj,
-                    language=None,  # Let Whisper auto-detect
+                    language="ar",  # Force Arabic; auto-detect misidentifies short clips
                     response_format="verbose_json",
                 )
 
                 # OpenAI Whisper verbose_json response has:
                 # text, language, duration, words (optional)
                 transcript = response.text or ""
-                detected_lang = getattr(response, "language", None)
+                raw_lang = getattr(response, "language", None)
+                # Whisper verbose_json returns full names ("arabic", "english"); normalise to ISO codes
+                _lang_map: dict[str, str] = {"arabic": "ar", "english": "en"}
+                detected_lang = _lang_map.get((raw_lang or "").lower(), "ar")
                 # confidence is not directly available from Whisper API
                 # we use None as a placeholder; in production you'd use word timing data
 

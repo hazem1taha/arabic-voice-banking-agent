@@ -17,9 +17,16 @@ class TimingResult:
     def __exit__(self, *args: object) -> None:
         self.elapsed_ms = (time.perf_counter() - self._start) * 1000.0
 
+    async def __aenter__(self) -> "TimingResult":
+        self._start = time.perf_counter()
+        return self
 
-async def timer() -> TimingResult:
-    """Async-compatible timer. Returns a TimingResult with elapsed_ms."""
+    async def __aexit__(self, *args: object) -> None:
+        self.elapsed_ms = (time.perf_counter() - self._start) * 1000.0
+
+
+def timer() -> TimingResult:
+    """Returns a TimingResult usable as sync or async context manager."""
     return TimingResult()
 
 
