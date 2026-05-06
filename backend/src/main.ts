@@ -1,8 +1,10 @@
+import 'dotenv/config'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import multipart from '@fastify/multipart'
 import { settings } from './config.js'
 import { logger } from './lib/logger.js'
+import { registerErrorSchemas } from './lib/error-schemas.js'
 import { registerRoutes, initServices } from './routes/conversation.js'
 import { closeRedis } from './services/session.js'
 import { existsSync, readFileSync } from 'fs'
@@ -18,6 +20,7 @@ async function main() {
   await fastify.register(cors, { origin: true })
   await fastify.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } })
 
+  registerErrorSchemas(fastify)
   await initServices()
   await registerRoutes(fastify)
 
